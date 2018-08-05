@@ -4,6 +4,7 @@ import asyncio
 import aiohttp
 import json
 import discord
+import os
 from discord import Game
 from discord.ext.commands import Bot
 from io import BytesIO

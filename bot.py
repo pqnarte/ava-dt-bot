@@ -15,8 +15,7 @@ import sqlite3
 
 ava_logo_url='https://upload.wikimedia.org/wikipedia/commons/1/15/Alliance-of-valiant-arms-logo.png'
 BOT_PREFIX = ("?")
-TOKEN = "NDczMTc1ODcxNDYxNzg1NjIw.Dj-HxQ.hGgAShhRM6AlC33nuhGzo5be8n0"
-general_weapon_stats = ['hitDamage','range','singleFireAcc','autoFireAcc','recoilControl','fireRate','magCapacity','mobility']
+general_weapon_stats = ['Hit Damage','Range','Single Fire Acc','Auto Fire Acc','Recoil Control','Fire Rate','Mag Capacity','Mobility']
 
 bot = Bot(command_prefix=BOT_PREFIX)
 bot.remove_command('help')
@@ -212,7 +211,7 @@ async def weapon(ctx, *args):
             embed.add_field(name=one_type+"'s:",value=get_weapons_by_type(one_type), inline = False)
         await bot.say(embed=embed)
     else:
-        if args[0].upper() == 'ADD':
+        if args[0].upper() == 'ADD' and ("473846017033502731" in role.id for role in ctx.message.author.roles):
             if not args[-1].upper() == 'MODS':
 
                 await bot.say('Add your weapon')
@@ -239,7 +238,7 @@ async def weapon(ctx, *args):
                 print(msg)
                 add_mods(msg[0].upper(),Weapon.Mod(msg[1],msg[2],msg[3]))
                 await bot.say('Mods added')
-        elif args[0].upper() == 'REMOVE':
+        elif args[0].upper() == 'REMOVE' and ("473846017033502731" in role.id for role in ctx.message.author.roles):
             text = ' '.join(args[1:]).upper()
             if (text == 'WEAPON'):
                 await bot.say('Type the name of the weapon you want to remove')

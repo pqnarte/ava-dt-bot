@@ -198,6 +198,10 @@ def clear_database():
 
 @bot.command(pass_context = True)
 async def weapon(ctx, *args):
+    admin = False
+    for role in ctx.message.author.roles:
+        if "454211665542512642" == role.id or "454100947115835392" == role.id:
+            admin = True
     user = ctx.message.author.name
     if len(args) == 0:
         notfound=0
@@ -211,11 +215,10 @@ async def weapon(ctx, *args):
             embed.add_field(name=one_type+"'s:",value=get_weapons_by_type(one_type), inline = False)
         await bot.say(embed=embed)
     else:
-        if args[0].upper() == 'ADD' and ("473846017033502731" in role.id for role in ctx.message.author.roles):
+        if ((args[0].upper() == 'ADD') and admin):
             if not args[-1].upper() == 'MODS':
-
                 await bot.say('Add your weapon')
-                await bot.say('`(weaponName, description, weapon_Class, image_URL)`')
+                await bot.say('`(weaponName; description; weapon_Class; image_URL)`')
                 msg = await bot.wait_for_message(author = ctx.message.author)
                 msg = msg.content.split(';')
                 description = msg[1].lstrip()
@@ -223,8 +226,8 @@ async def weapon(ctx, *args):
                 msg = ';'.join(msg).translate({ord(i):None for i in "'() "}).split(';')
                 await bot.say('Adding weapon ' + input)
                 add_weapon(Weapon(input,description,msg[2],msg[3]))
-                await bot.say('Weapon '+input+' added to the database\nNow type the stats separated by spaces:')
-                await bot.say('`(hitDamage, range, singleFireAcc, autoFireAcc, recoilControl, fireRate, magCapacity, mobility)`')
+                await bot.say('Weapon '+input+' added to the database\nNow type the stats separated by ";":')
+                await bot.say('`(hitDamage; range; singleFireAcc; autoFireAcc; recoilControl; fireRate; magCapacity; mobility)`')
                 msg = await bot.wait_for_message(author = ctx.message.author)
                 msg = msg.content.translate({ord(i):None for i in "'() "}).split(';')
                 print(msg)
@@ -232,13 +235,13 @@ async def weapon(ctx, *args):
                 await bot.say('Stats added')
             else:
                 await bot.say('Add your weapon mod')
-                await bot.say('`(weaponName, modName, modStat, valueModifier)`')
+                await bot.say('`(weaponName; modName; modStat; valueModifier)`')
                 msg = await bot.wait_for_message(author = ctx.message.author)
                 msg = msg.content.translate({ord(i):None for i in "'() "}).split(';')
                 print(msg)
                 add_mods(msg[0].upper(),Weapon.Mod(msg[1],msg[2],msg[3]))
                 await bot.say('Mods added')
-        elif args[0].upper() == 'REMOVE' and ("473846017033502731" in role.id for role in ctx.message.author.roles):
+        elif ((args[0].upper() == 'REMOVE') and admin):
             text = ' '.join(args[1:]).upper()
             if (text == 'WEAPON'):
                 await bot.say('Type the name of the weapon you want to remove')
@@ -252,10 +255,12 @@ async def weapon(ctx, *args):
                 await bot.say(msg.content.upper()+' mods removed')
             elif (text == 'MODS'):
                 await bot.say('Type the name and the weapon mod you want to remove')
-                await bot.say('`(weaponName, modName)`')
+                await bot.say('`(weaponName; modName)`')
                 msg = await bot.wait_for_message(author = ctx.message.author)
                 msg = msg.content.translate({ord(i):None for i in "'() "}).split(';')
                 remove_mod(msg[0].upper(),msg[1])
+        if (((args[0].upper() == 'REMOVE') or (args[0].upper() == 'ADD')) and not admin):
+            await bot.say("You don't have permissions for that!")
         elif args[-1].upper() == 'MODS':
             print('MAIN FUNCTION MODS')
             input = ' '.join(args[:-1]).upper()
@@ -298,7 +303,6 @@ async def weapon(ctx, *args):
                 embed.add_field(name=str(general_weapon_stats[i]+':'),value=str(weapon_stats[i]))
             print('print embed')
             await bot.say(embed=embed)
-
 
 #---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #AVA ADMIN Commands

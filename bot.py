@@ -14,7 +14,7 @@ from weapon import Weapon
 import sqlite3
 
 ava_logo_url='https://upload.wikimedia.org/wikipedia/commons/1/15/Alliance-of-valiant-arms-logo.png'
-BOT_PREFIX = ("?")
+BOT_PREFIX = (".")
 general_weapon_stats = ['Hit Damage','Range','Single Fire Acc','Auto Fire Acc','Recoil Control','Fire Rate','Mag Capacity','Mobility']
 
 bot = Bot(command_prefix=BOT_PREFIX)

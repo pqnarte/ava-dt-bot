@@ -32,26 +32,58 @@ async def on_ready():
 #---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #general commands
 #---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 @bot.command(pass_context = True)
 async def help(ctx):
     author = ctx.message.author
-    embed = discord.Embed(description = "<> = optional\n/ = or", colour=0x00ffff)
-    embed.set_author(name='Possible commands:')
-    embed.add_field(name=BOT_PREFIX+'info @user',value='Returns @user info', inline = False)
-    embed.add_field(name=BOT_PREFIX+'serverinfo',value='Returns server info', inline = False)
-    #embed.add_field(name=BOT_PREFIX+'clean_database',value='Cleans everything in the database, (to be removed)', inline = False)
-    text = BOT_PREFIX+"weapon\t<remove (weapon / mods / all mods)>\n\t\t\t\t\t <(weapon_name / add) <mods>>"
-    description = ("Possible uses:\n"+
-                    BOT_PREFIX+"weapon: displays all weapons arranged by classes\n"+
-                    BOT_PREFIX+"weapon weapon_name: displays the weapon stats\n"+
-                    BOT_PREFIX+"weapon weapon_name mods: display all the mods of the weapon and related stat modifications\n"+
-                    BOT_PREFIX+"weapon add: adds a weapon to the database\n"+
-                    BOT_PREFIX+"weapon add mods: adds one mod to the weapon, if that mod has more than 1 stat effect, use the code again with the same mod name\n"+
-                    BOT_PREFIX+"weapon remove weapon: removes a weapon from the database\n"+
-                    BOT_PREFIX+"weapon remove mods: removes a specific mod from a weapon\n"+
-                    BOT_PREFIX+"weapon remove all mods: removes all mods stored in the database of that weapon")
-    embed.add_field(name=text,value=description, inline = False)
-    await bot.send_message(author, embed=embed)
+    help_string = ("""```fix
+ -----------------------------------------------------------------------------------------------------
+|                                            Help Commands                                            |
+ ----------------------------------------------------------------------------------------------------- ```
+
+__**General commands:**__
+```md
+# .info @user
+> Shows some info about the @user
+
+# .serverinfo
+> Shows some info about the server
+
+# .check_admin_status
+> Checks if you can do the admin commands```
+
+__**AVA Dog Tag commands:**__
+```md
+# .weapons
+> Presents you a simple list of all the weapons available
+
+# .pistols
+> Presents you a simple list of all the pistols available
+
+# .weapon <weapon_name_here>
+> Shows all the stats about the weapon you select
+
+# .maplist
+> Presents you a simple list of all the maps available
+
+# .map <map_name_here>
+> Shows the map image for all to see```
+
+__**AVA Dog Tag Admin commands:**__
+```md
+# .add <weapon/mod/map>
+> Adds stuff to the database
+
+# .remove <weapon/mod/all mods/map>
+> Removes stuff to the database
+
+# .update <weapon/mod/map/weapon_stats>
+> Updates some info on the database
+
+# .clean_database
+> Erases the database for a fresh start (WARNING)```""")
+    await bot.send_message(author, help_string)
+    await bot.say(str(author.display_name)+", I sent you a private message with the help commands.")
 
 @bot.command(pass_context=True)
 async def info(ctx, user: discord.Member):
@@ -99,7 +131,6 @@ def add_weapon(weap):
     with conn:
         c.execute("INSERT INTO weapons VALUES (:weaponName, :description, :weaponClass, :imageURL)",
             {'weaponName': weap.weaponName, 'description': weap.description, 'weaponClass': weap.weaponClass, 'imageURL': weap.imageURL})
-        c.execute("DELETE FROM weapons WHERE rowid NOT IN (SELECT max(rowid) FROM weapons GROUP BY weaponName)")
 
 def add_stats(weaponName, stats):
     with conn:
@@ -162,6 +193,14 @@ def get_mod_values(weaponName,modName):
     print(string)
     return string
 
+def remove_last_weapon():
+    with conn:
+        c.execute("DELETE FROM weapons WHERE rowid IN (SELECT max(rowid) FROM weapons)")
+
+def remove_duplicate_weapons():
+    with conn:
+        c.execute("DELETE FROM weapons WHERE rowid NOT IN (SELECT max(rowid) FROM weapons GROUP BY weaponName)")
+
 def remove_weapon(weaponName):
     print('REMOVE WEAPON FUNCTION')
     print(weaponName)
@@ -192,93 +231,64 @@ def clear_database():
         c.execute("DELETE from mods")
         c.execute("DELETE from stats")
 
+def check_admin_status(ctx):
+    for role in ctx.message.author.roles:
+        if "454211665542512642" == role.id or "454100947115835392" == role.id:
+            return True
+    if "180787341248561152" == ctx.message.author.id:
+        return True
+    return False
+
+def remove_leads(args):
+    print(args)
+    temp = args.split(';')
+    for j in range(len(temp)):
+        temp[j] = temp[j].lstrip()
+    args = ';'.join(temp)
+    print(args)
+    return args
+
+
 #---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #AVA Commands
 #---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+@bot.command()
+async def weapons():
+    embed = discord.Embed(color=0xff0000)
+    embed.set_thumbnail(url=ava_logo_url)
+    all_types = c.execute("SELECT weaponClass FROM weapons WHERE rowid IN (SELECT min(rowid) FROM weapons GROUP BY weaponClass)").fetchall()
+    print(all_types)
+    for one_type in all_types:
+        one_type = str(one_type).translate({ord(i):None for i in "'(),"})
+        embed.add_field(name="\u200b \n"+one_type+"'s:",value=get_weapons_by_type(one_type), inline = False)
+    await bot.say(embed=embed)
+
+@bot.command()
+async def pistols():
+    await bot.say("*To be implemented*")
+
+@bot.command()
+async def maplist():
+    await bot.say("*To be implemented*")
+
+@bot.command()
+async def map():
+    await bot.say("*To be implemented*")
+
 @bot.command(pass_context = True)
 async def weapon(ctx, *args):
-    admin = False
-    for role in ctx.message.author.roles:
-        if "454211665542512642" == role.id or "454100947115835392" == role.id:
-            admin = True
-    user = ctx.message.author.name
     if len(args) == 0:
-        notfound=0
-        description = "Type '"+BOT_PREFIX+"weapon weapon_name' for the stats"
-        embed = discord.Embed(title = "Possible weapon names are: ",description=description,color=0x00ff00)
-        embed.set_thumbnail(url=ava_logo_url)
-        all_types = c.execute("SELECT weaponClass FROM weapons WHERE rowid IN (SELECT min(rowid) FROM weapons GROUP BY weaponClass)").fetchall()
-        print(all_types)
-        for one_type in all_types:
-            one_type = str(one_type).translate({ord(i):None for i in "'(),"})
-            embed.add_field(name=one_type+"'s:",value=get_weapons_by_type(one_type), inline = False)
-        await bot.say(embed=embed)
+        await bot.say("You need to type the weapon name!!\n If you don't know what weapons are availabe type: `.weapons` or `.pistols`")
     else:
-        if ((args[0].upper() == 'ADD') and admin):
-            if not args[-1].upper() == 'MODS':
-                await bot.say('Add your weapon')
-                await bot.say('`(weaponName; description; weapon_Class; image_URL)`')
-                msg = await bot.wait_for_message(author = ctx.message.author)
-                msg = msg.content.split(';')
-                description = msg[1].lstrip()
-                input = msg[0].lstrip().upper()
-                msg = ';'.join(msg).translate({ord(i):None for i in "'() "}).split(';')
-                await bot.say('Adding weapon ' + input)
-                add_weapon(Weapon(input,description,msg[2],msg[3]))
-                await bot.say('Weapon '+input+' added to the database\nNow type the stats separated by ";":')
-                await bot.say('`(hitDamage; range; singleFireAcc; autoFireAcc; recoilControl; fireRate; magCapacity; mobility)`')
-                msg = await bot.wait_for_message(author = ctx.message.author)
-                msg = msg.content.translate({ord(i):None for i in "'() "}).split(';')
-                print(msg)
-                add_stats(input,Weapon.Stats(msg[0],msg[1],msg[2],msg[3],msg[4],msg[5],msg[6],msg[7]))
-                await bot.say('Stats added')
-            else:
-                await bot.say('Add your weapon mod')
-                await bot.say('`(weaponName; modName; modStat; valueModifier)`')
-                msg = await bot.wait_for_message(author = ctx.message.author)
-                msg = msg.content.translate({ord(i):None for i in "'() "}).split(';')
-                print(msg)
-                add_mods(msg[0].upper(),Weapon.Mod(msg[1],msg[2],msg[3]))
-                await bot.say('Mods added')
-        elif ((args[0].upper() == 'REMOVE') and admin):
-            text = ' '.join(args[1:]).upper()
-            if (text == 'WEAPON'):
-                await bot.say('Type the name of the weapon you want to remove')
-                msg = await bot.wait_for_message(author = ctx.message.author)
-                remove_weapon(msg.content.upper())
-                await bot.say(msg.content.upper()+' removed')
-            elif (text == 'ALL MODS'):
-                await bot.say('Type the name of the weapon you want to remove the mods from')
-                msg = await bot.wait_for_message(author = ctx.message.author)
-                remove_allmods(msg.content.upper())
-                await bot.say(msg.content.upper()+' mods removed')
-            elif (text == 'MODS'):
-                await bot.say('Type the name and the weapon mod you want to remove')
-                await bot.say('`(weaponName; modName)`')
-                msg = await bot.wait_for_message(author = ctx.message.author)
-                msg = msg.content.translate({ord(i):None for i in "'() "}).split(';')
-                remove_mod(msg[0].upper(),msg[1])
-        if (((args[0].upper() == 'REMOVE') or (args[0].upper() == 'ADD')) and not admin):
-            await bot.say("You don't have permissions for that!")
-        elif args[-1].upper() == 'MODS':
-            print('MAIN FUNCTION MODS')
+        if args[-1].upper() == 'MODS':
             input = ' '.join(args[:-1]).upper()
-            print(input)
             mods = get_mods(input).split('\n')
-            print('MAIN FUNCTION MODS')
-            print(input)
             embed = discord.Embed(title=input+' mods')
             embed.set_thumbnail(url=ava_logo_url)
             for mod in mods:
-                print(input + '.' + mod)
                 stats = get_mod_values(input,mod).split(';')
-                print('MAIN FUNCTION')
-                print(stats)
-                print()
                 stats = ': '.join(stats)
-                print(mod)
-                print(stats)
                 embed.add_field(name=str(mod),value=str(stats), inline = False)
             await bot.say(embed=embed)
         else:
@@ -286,64 +296,123 @@ async def weapon(ctx, *args):
             try:
                 weapon_stats = str(get_stats(weaponName)).split(';')
                 weapon_info = str(get_weapon(weaponName)).split(';')
-                print('MAIN FUNCTION STATS')
-                print(weaponName)
-                print(weapon_stats)
-                print(weapon_info)
                 embed = discord.Embed(title=weaponName,description=weapon_info[1], color = 0x00ff00)
                 embed.set_thumbnail(url=ava_logo_url)
                 imageURL = str(weapon_info[-1])
-                print(imageURL)
                 if not imageURL == 'N/A':
                     embed.set_image(url=imageURL)
-            #embed.set_image(url=imageURL)
                 for i in range(len(weapon_stats)):
                     stat = weapon_stats[i]
-                    print(stat)
-                    print(general_weapon_stats[i])
                     embed.add_field(name=str(general_weapon_stats[i]+':'),value=str(weapon_stats[i]))
-                print('print embed')
                 await bot.say(embed=embed)
-            except Exception as e:
-                await bot.say(weaponName+' not found!')
+            except Exception:
+                await bot.say(weaponName+" not found, sorry.")
+
 
 #---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #AVA ADMIN Commands
 #---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-'''
-@bot.command()
-async def clean_database():
-    clear_database()
-'''
 
+@bot.command(pass_context = True)
+async def clean_database(ctx):
+    if check_admin_status(ctx):
+        await bot.say("Are you sure you want to delete everything?\nThis cannot be undo\n`yes`   or   `no`")
+        msg = await bot.wait_for_message(author = ctx.message.author)
+        if msg.content.upper() == "YES":
+            await bot.say("Database cleaned")
+        else:
+            await bot.say("Process canceled")
+
+@bot.command(pass_context = True)
+async def add(ctx, *args):
+    if check_admin_status(ctx):
+        if len(args) == 0:
+            await bot.say("You have to choose to add a weapon, mod or map!\nExample: .add weapon")
+        else:
+            args = ' '.join(args)
+            if args.upper() == 'WEAPON':
+                try:
+                    await bot.say('Add your weapon, if you have no image_URL, type N/A instead')
+                    await bot.say('`weaponName; description; weapon_Class; image_URL`')
+                    msg = await bot.wait_for_message(author = ctx.message.author)
+                    msg = remove_leads(msg.content).split(';')
+                    await bot.say('Adding weapon ' + msg[0].upper())
+                    add_weapon(Weapon(msg[0].upper(),msg[1],msg[2],msg[3]))
+                    await bot.say('Weapon '+msg[0].upper()+' added to the database\nNow type the stats separated by ";":')
+                except Exception:
+                    await bot.say("You didn't type the values well...")
+                try:
+                    await bot.say('`Hit Damage; Range; Single Fire Acc; Auto Fire Acc; Recoil Control; Fire Rate; Mag Capacity; Mobility`')
+                    msg = await bot.wait_for_message(author = ctx.message.author)
+                    msg = remove_leads(msg.content).split(';')
+                    print(msg)
+                    add_stats(input,Weapon.Stats(msg[0],msg[1],msg[2],msg[3],msg[4],msg[5],msg[6],msg[7]))
+                    await bot.say('Stats added')
+                    remove_duplicate_weapons()
+                except Exception:
+                    await bot.say("You didn't type the values well...")
+                    await bot.say("Weapon removed from the database..")
+                    remove_last_weapon()
+            elif args.upper() == 'MOD':
+                await bot.say('Add your weapon mod')
+                await bot.say('`Weapon Name; Mod Name; Mod Stat; Stat Value Modifier`')
+                msg = await bot.wait_for_message(author = ctx.message.author)
+                msg = remove_leads(msg.content).split(';')
+                add_mods(msg[0].upper(),Weapon.Mod(msg[1],msg[2],msg[3]))
+            elif args.upper() == 'MAP':
+                await bot.say("*To be implemented*")
+            else:
+                await bot.say("That's not possible, sorry.")
+    else:
+        await bot.say("You don't have permissions to add stuff!")
+
+@bot.command(pass_context = True)
+async def remove(ctx, *args):
+    if check_admin_status(ctx):
+        if len(args) == 0:
+            await bot.say("You have to choose to remove a weapon, mod or map!\nExample: .remove weapon")
+        else:
+            args = ' '.join(args)
+            if args.upper() == 'WEAPON':
+                await bot.say('Type the name of the weapon you want to remove')
+                msg = await bot.wait_for_message(author = ctx.message.author)
+                remove_weapon(msg.content.upper())
+                await bot.say(msg.content.upper()+' removed')
+            elif args.upper() == 'ALL MODS':
+                await bot.say('Type the name of the weapon you want to remove the mods from')
+                msg = await bot.wait_for_message(author = ctx.message.author)
+                remove_allmods(msg.content.upper())
+                await bot.say(msg.content.upper()+' mods removed')
+            elif args.upper() == 'MOD':
+                await bot.say('Type the name and the weapon mod you want to remove')
+                await bot.say('`weaponName; modName`')
+                msg = await bot.wait_for_message(author = ctx.message.author)
+                msg = remove_leads(msg.content).split(';')
+                remove_mod(msg[0].upper(),msg[1])
+            elif args.upper() == 'MAP':
+                await bot.say("*To be implemented*")
+            else:
+                await bot.say("That's not possible, sorry.")
+    else:
+        await bot.say("You don't have permissions to add stuff!")
+
+@bot.command(pass_context = True):
+async def update(ctx):
+    if check_admin_status(ctx):
+        await bot.say("*To be implemented*")
+    else:
+        await bot.say("You don't have permissions to update stuff!")
 
 #---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #temporary commands
 #---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-'''
-@bot.command()
-async def logout():
-    await bot.say('Cya!')
-    await bot.logout()
 
-@bot.command()
-async def initializedata():
-    remove_allmods('UZI')
-    add_weapon(Weapon('UZI', 'SIMPLE SMG', 'SMG', 'simpleURL.png'))
-    add_weapon(Weapon('MP7A1', 'SIMPLE SMG', 'SMG', 'simpleURL.png'))
-    add_weapon(Weapon('MP7A1', 'LATEST SMG', 'SMG', 'simpleURL.png'))
-    add_weapon(Weapon('Random smg', 'SIMPLE SMG', 'SMG', 'simpleURL.png'))
-    add_weapon(Weapon('not sniper', 'LATEST SMG', 'SMG', 'simpleURL.png'))
-    add_stats('UZI',Weapon.Stats(1,2,3,4,5,6,7,8))
-    add_mods('UZI',Weapon.Mod('Barrel #1','autoFireAcc','+2'))
-    add_mods('UZI',Weapon.Mod('Barrel #1','singleFireAcc','-2'))
-    add_mods('UZI',Weapon.Mod('Barrel #2','autoFireAcc','+2'))
-    add_mods('UZI',Weapon.Mod('Barrel #2','singleFireAcc','-5'))
-    add_weapon(Weapon('sv98', 'SIMPLE sniper', 'SNIPER', 'simpleURL.png'))
-    add_weapon(Weapon('sv98', 'SIMPLE sniper', 'SNIPER', 'simpleURL.png'))
-    await bot.say('Data initialized')
-'''
-
+@bot.command(pass_context = True)
+async def check_admin_status(ctx):
+    if check_admin_status(ctx):
+        await bot.say('You have BIG permissions! :O')
+    else:
+        await bot.say("You can't do the big stuff, sry")
 #---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #Bot services
 #---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

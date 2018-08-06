@@ -378,7 +378,7 @@ async def add(ctx, *args):
                 msg = remove_leads(msg.content).split(';')
                 weaponName = msg[0].upper()
                 try:
-                    add_weapon(Weapon(weaponName,msg[1],msg[2],msg[3]))
+                    add_weapon(Weapon(weaponName,msg[1],msg[2].upper(),msg[3]))
                     await bot.say('Weapon '+msg[0].upper()+' added to the database\nNow type the stats separated by ";":')
                 except Exception:
                     await bot.say("You didn't type the values well...")

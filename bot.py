@@ -60,9 +60,6 @@ __**AVA Dog Tag commands:**__
 # .weapons
 > Presents you a simple list of all the weapons available
 
-# .pistols
-> Presents you a simple list of all the pistols available
-
 # .weapon <weapon_name_here>
 > Shows all the stats about the weapon you select
 

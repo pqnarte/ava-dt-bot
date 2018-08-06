@@ -281,6 +281,8 @@ async def weapon(ctx, *args):
                 print(stats)
                 embed.add_field(name=str(mod),value=str(stats), inline = False)
             await bot.say(embed=embed)
+        elif args[0].upper() == 'PISTOL':
+            await bot.say('BAZINGA!')
         else:
             weaponName = ' '.join(args).upper()
             weapon_stats = str(get_stats(weaponName)).split(';')

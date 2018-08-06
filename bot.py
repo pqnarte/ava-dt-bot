@@ -396,7 +396,7 @@ async def remove(ctx, *args):
     else:
         await bot.say("You don't have permissions to add stuff!")
 
-@bot.command(pass_context = True):
+@bot.command(pass_context = True)
 async def update(ctx):
     if check_admin_status(ctx):
         await bot.say("*To be implemented*")

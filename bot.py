@@ -372,21 +372,21 @@ async def add(ctx, *args):
         else:
             args = ' '.join(args)
             if args.upper() == 'WEAPON':
+                await bot.say('Add your weapon, if you have no image_URL, type N/A instead')
+                await bot.say('`weaponName; description; weapon_Class; image_URL`')
+                msg = await bot.wait_for_message(author = ctx.message.author)
+                msg = remove_leads(msg.content).split(';')
+		weaponName = msg[0].upper()
                 try:
-                    await bot.say('Add your weapon, if you have no image_URL, type N/A instead')
-                    await bot.say('`weaponName; description; weapon_Class; image_URL`')
-                    msg = await bot.wait_for_message(author = ctx.message.author)
-                    msg = remove_leads(msg.content).split(';')
-                    add_weapon(Weapon(msg[0].upper(),msg[1],msg[2],msg[3]))
+                    add_weapon(Weapon(weaponName,msg[1],msg[2],msg[3]))
                     await bot.say('Weapon '+msg[0].upper()+' added to the database\nNow type the stats separated by ";":')
                 except Exception:
                     await bot.say("You didn't type the values well...")
+                await bot.say('`Hit Damage; Range; Single Fire Acc; Auto Fire Acc; Recoil Control; Fire Rate; Mag Capacity; Mobility`')
+                msg = await bot.wait_for_message(author = ctx.message.author)
+                msg = remove_leads(msg.content).split(';')
                 try:
-                    await bot.say('`Hit Damage; Range; Single Fire Acc; Auto Fire Acc; Recoil Control; Fire Rate; Mag Capacity; Mobility`')
-                    msg = await bot.wait_for_message(author = ctx.message.author)
-                    msg = remove_leads(msg.content).split(';')
-                    print(msg)
-                    add_stats(input,Weapon.Stats(msg[0],msg[1],msg[2],msg[3],msg[4],msg[5],msg[6],msg[7]))
+                    add_stats(weaponName,Weapon.Stats(msg[0],msg[1],msg[2],msg[3],msg[4],msg[5],msg[6],msg[7]))
                     await bot.say('Stats added')
                     remove_duplicate_weapons()
                 except Exception:

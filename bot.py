@@ -295,10 +295,6 @@ async def maplist():
         await bot.say("Something wrong..")
 
 @bot.command()
-async def pistols():
-    await bot.say("*To be implemented*")
-
-@bot.command()
 async def map(*args):
     if len(args) == 0:
         await bot.say("You need to type the map name!!\n If you don't know what weapons are availabe type: `.maplist`")

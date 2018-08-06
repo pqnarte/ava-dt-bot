@@ -11,6 +11,7 @@ from io import BytesIO
 import xml.etree.ElementTree as ET
 from discord.ext import commands
 from weapon import Weapon
+from map import Map
 import sqlite3
 
 ava_logo_url='https://upload.wikimedia.org/wikipedia/commons/1/15/Alliance-of-valiant-arms-logo.png'
@@ -19,8 +20,10 @@ general_weapon_stats = ['Hit Damage','Range','Single Fire Acc','Auto Fire Acc','
 
 bot = Bot(command_prefix=BOT_PREFIX)
 bot.remove_command('help')
-conn = sqlite3.connect('weapon.db'); #Bom para testar
+conn = sqlite3.connect('weapon.db') #Bom para testar
 c = conn.cursor()
+connmap = sqlite3.connect('map.db')
+cm = connmap.cursor()
 
 print(discord.__version__)
 
@@ -126,6 +129,10 @@ async def serverinfo(ctx):
 #---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #AVA functions
 #---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+def add_map(map):
+    with connmap:
+        cm.execute("INSERT INTO maps VALUES (:mapName, :maplayoutURL, :mapvideo)",
+            {'mapName': map.mapName, 'maplayoutURL': map.maplayoutURL, 'mapvideo': map.mapvideo})
 
 def add_weapon(weap):
     with conn:
@@ -149,11 +156,15 @@ def add_mods(weaponName, mod):
             {'weaponName': weaponName, 'modName': mod.modName, 'modStat': mod.modStat, 'valueModifier': mod.valueModifier})
 
 def get_weapon(weaponName):
-    print('GET WEAPON FUNCTION')
-    string = ""
     weapon = c.execute("SELECT * FROM weapons WHERE weaponName=:weaponName", {'weaponName': weaponName}).fetchone()
     weapon = ';'.join(weapon)
     return weapon
+
+def get_map(mapName):
+    map = cm.execute("SELECT * FROM maps WHERE mapName=:mapName", {'mapName': mapName}).fetchone()
+    map = ';'.join(map)
+    print(map)
+    return map
 
 def get_weapons_by_type(weaponClass):
     string = ""
@@ -201,9 +212,16 @@ def remove_duplicate_weapons():
     with conn:
         c.execute("DELETE FROM weapons WHERE rowid NOT IN (SELECT max(rowid) FROM weapons GROUP BY weaponName)")
 
+def remove_duplicate_maps():
+    with connmap:
+        cm.execute("DELETE FROM maps WHERE rowid NOT IN (SELECT max(rowid) FROM maps GROUP BY mapName)")
+
+def remove_map(mapName):
+    with connmap:
+        cm.execute("DELETE FROM maps WHERE mapName = :mapName",
+        {'mapName':mapName})
+
 def remove_weapon(weaponName):
-    print('REMOVE WEAPON FUNCTION')
-    print(weaponName)
     with conn:
         c.execute("DELETE FROM weapons WHERE weaponName = :weaponName",
         {'weaponName':weaponName})
@@ -265,19 +283,42 @@ async def weapons():
     await bot.say(embed=embed)
 
 @bot.command()
+async def maplist():
+    try:
+        embed = discord.Embed(color=0xff0000)
+        embed.set_thumbnail(url=ava_logo_url)
+        all_types = cm.execute("SELECT mapName FROM maps").fetchall()
+        print(all_types)
+        string = ""
+        for one_type in all_types:
+            string += str(one_type).translate({ord(i):None for i in "'(),"}) + '\n'
+        embed.add_field(name="\u200b\n",value=string, inline = False)
+        await bot.say(embed=embed)
+    except Exception:
+        await bot.say("Something wrong..")
+
+@bot.command()
 async def pistols():
     await bot.say("*To be implemented*")
 
 @bot.command()
-async def maplist():
-    await bot.say("*To be implemented*")
+async def map(*args):
+    if len(args) == 0:
+        await bot.say("You need to type the map name!!\n If you don't know what weapons are availabe type: `.maplist`")
+    else:
+        mapName = ' '.join(args).upper()
+        try:
+            map_info = str(get_map(mapName)).split(';')
+            embed = discord.Embed(title=mapName + ' map layout: ', color = 0x00ffff)
+            embed.set_thumbnail(url=ava_logo_url)
+            embed.set_image(url=map_info[1])
+            await bot.say(embed=embed)
+            await bot.say(map_info[2]+"\nCheck a video about the map! Or click the link for better resolution!")
+        except Exception:
+            await bot.say(mapName+" not found, sorry.")
 
 @bot.command()
-async def map():
-    await bot.say("*To be implemented*")
-
-@bot.command(pass_context = True)
-async def weapon(ctx, *args):
+async def weapon(*args):
     if len(args) == 0:
         await bot.say("You need to type the weapon name!!\n If you don't know what weapons are availabe type: `.weapons` or `.pistols`")
     else:
@@ -336,7 +377,6 @@ async def add(ctx, *args):
                     await bot.say('`weaponName; description; weapon_Class; image_URL`')
                     msg = await bot.wait_for_message(author = ctx.message.author)
                     msg = remove_leads(msg.content).split(';')
-                    await bot.say('Adding weapon ' + msg[0].upper())
                     add_weapon(Weapon(msg[0].upper(),msg[1],msg[2],msg[3]))
                     await bot.say('Weapon '+msg[0].upper()+' added to the database\nNow type the stats separated by ";":')
                 except Exception:
@@ -360,7 +400,16 @@ async def add(ctx, *args):
                 msg = remove_leads(msg.content).split(';')
                 add_mods(msg[0].upper(),Weapon.Mod(msg[1],msg[2],msg[3]))
             elif args.upper() == 'MAP':
-                await bot.say("*To be implemented*")
+                try:
+                    await bot.say('Add your map!')
+                    await bot.say('`Map Name; Map layout URL; Map Video Link`')
+                    msg = await bot.wait_for_message(author = ctx.message.author)
+                    msg = remove_leads(msg.content).split(';')
+                    add_map(Map(msg[0].upper(),msg[1],msg[2]))
+                    await bot.say('Map '+msg[0].upper()+' added to the database')
+                    remove_duplicate_maps()
+                except Exception:
+                    await bot.say("You didn't type the values well...")
             else:
                 await bot.say("That's not possible, sorry.")
     else:
@@ -390,7 +439,10 @@ async def remove(ctx, *args):
                 msg = remove_leads(msg.content).split(';')
                 remove_mod(msg[0].upper(),msg[1])
             elif args.upper() == 'MAP':
-                await bot.say("*To be implemented*")
+                await bot.say('Type the name of the map you want to remove from the database')
+                msg = await bot.wait_for_message(author = ctx.message.author)
+                remove_map(msg.content.upper())
+                await bot.say(msg.content.upper()+' map removed')
             else:
                 await bot.say("That's not possible, sorry.")
     else:

@@ -376,7 +376,7 @@ async def add(ctx, *args):
                 await bot.say('`weaponName; description; weapon_Class; image_URL`')
                 msg = await bot.wait_for_message(author = ctx.message.author)
                 msg = remove_leads(msg.content).split(';')
-		weaponName = msg[0].upper()
+                weaponName = msg[0].upper()
                 try:
                     add_weapon(Weapon(weaponName,msg[1],msg[2],msg[3]))
                     await bot.say('Weapon '+msg[0].upper()+' added to the database\nNow type the stats separated by ";":')

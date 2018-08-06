@@ -281,30 +281,31 @@ async def weapon(ctx, *args):
                 print(stats)
                 embed.add_field(name=str(mod),value=str(stats), inline = False)
             await bot.say(embed=embed)
-        elif args[0].upper() == 'PISTOL':
-            await bot.say('BAZINGA!')
         else:
             weaponName = ' '.join(args).upper()
-            weapon_stats = str(get_stats(weaponName)).split(';')
-            weapon_info = str(get_weapon(weaponName)).split(';')
-            print('MAIN FUNCTION STATS')
-            print(weaponName)
-            print(weapon_stats)
-            print(weapon_info)
-            embed = discord.Embed(title=weaponName,description=weapon_info[1], color = 0x00ff00)
-            embed.set_thumbnail(url=ava_logo_url)
-            imageURL = str(weapon_info[-1])
-            print(imageURL)
-            if not imageURL == 'N/A':
-                embed.set_image(url=imageURL)
+            try:
+                weapon_stats = str(get_stats(weaponName)).split(';')
+                weapon_info = str(get_weapon(weaponName)).split(';')
+                print('MAIN FUNCTION STATS')
+                print(weaponName)
+                print(weapon_stats)
+                print(weapon_info)
+                embed = discord.Embed(title=weaponName,description=weapon_info[1], color = 0x00ff00)
+                embed.set_thumbnail(url=ava_logo_url)
+                imageURL = str(weapon_info[-1])
+                print(imageURL)
+                if not imageURL == 'N/A':
+                    embed.set_image(url=imageURL)
             #embed.set_image(url=imageURL)
-            for i in range(len(weapon_stats)):
-                stat = weapon_stats[i]
-                print(stat)
-                print(general_weapon_stats[i])
-                embed.add_field(name=str(general_weapon_stats[i]+':'),value=str(weapon_stats[i]))
-            print('print embed')
-            await bot.say(embed=embed)
+                for i in range(len(weapon_stats)):
+                    stat = weapon_stats[i]
+                    print(stat)
+                    print(general_weapon_stats[i])
+                    embed.add_field(name=str(general_weapon_stats[i]+':'),value=str(weapon_stats[i]))
+                print('print embed')
+                await bot.say(embed=embed)
+            except Exception as e:
+		await bot.say(weaponName+' not found!')
 
 #---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #AVA ADMIN Commands

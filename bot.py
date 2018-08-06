@@ -305,7 +305,7 @@ async def weapon(ctx, *args):
                 print('print embed')
                 await bot.say(embed=embed)
             except Exception as e:
-		await bot.say(weaponName+' not found!')
+                await bot.say(weaponName+' not found!')
 
 #---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #AVA ADMIN Commands

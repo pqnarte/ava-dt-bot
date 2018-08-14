@@ -30,7 +30,7 @@ print(discord.__version__)
 
 @bot.event
 async def on_ready():
-    await bot.change_presence(game=discord.Game(name='AVA Dog Tag', type=1), status=None, afk=False)
+    await bot.change_presence(game=discord.Game(name='Type .help for help', type=1), status=None, afk=False)
 
 #---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #general commands

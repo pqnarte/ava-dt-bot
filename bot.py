@@ -37,12 +37,33 @@ async def on_ready():
 #---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 @bot.command(pass_context = True)
+async def helpadmin(ctx):
+    author = ctx.message.author
+    help_string = ("""__**AVA Dog Tag Admin commands:**__
+```md
+# .add <weapon/mod/map>
+> Adds stuff to the database
+
+# .remove <weapon/mod/all mods/map>
+> Removes stuff to the database
+
+# .update <weapon/mod/map/weapon_stats>
+> Updates some info on the database
+
+# .clean_database
+> Erases the database for a fresh start (WARNING)```""")
+    await bot.send_message(author, help_string)
+    await bot.say(str(author.display_name)+", I sent you a private message with the admin help commands.")
+
+@bot.command(pass_context = True)
 async def help(ctx):
     author = ctx.message.author
     help_string = ("""```fix
  -----------------------------------------------------------------------------------------------------
 |                                            Help Commands                                            |
  ----------------------------------------------------------------------------------------------------- ```
+
+__Type `.helpadmin` for admin commands__
 
 __**General commands:**__
 ```md
@@ -67,21 +88,7 @@ __**AVA Dog Tag commands:**__
 > Presents you a simple list of all the maps available
 
 # .map <map_name_here>
-> Shows the map image for all to see```
-
-__**AVA Dog Tag Admin commands:**__
-```md
-# .add <weapon/mod/map>
-> Adds stuff to the database
-
-# .remove <weapon/mod/all mods/map>
-> Removes stuff to the database
-
-# .update <weapon/mod/map/weapon_stats>
-> Updates some info on the database
-
-# .clean_database
-> Erases the database for a fresh start (WARNING)```""")
+> Shows the map image for all to see```""")
     await bot.send_message(author, help_string)
     await bot.say(str(author.display_name)+", I sent you a private message with the help commands.")
 

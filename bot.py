@@ -58,9 +58,13 @@ __**AVA Dog Tag Admin commands:**__
 # .clean_database
 > Erases the database for a fresh start (WARNING)```""")
         await bot.send_message(author, help_string)
-        await bot.say(str(author.display_name)+", I sent you a private message with the admin help commands.")
+        message = await bot.say(str(author.display_name)+", I sent you a private message with the admin help commands.")
+        await asyncio.sleep(100)
+        await bot.delete_message(message)
     else:
-        await bot.say("You don't have admin privileges!")
+        message = await bot.say("You don't have admin privileges!")
+        await asyncio.sleep(100)
+        await bot.delete_message(message)
 
 @bot.command(pass_context = True)
 async def help(ctx):
@@ -94,7 +98,9 @@ __**AVA Dog Tag commands:**__
 # .map <map_name_here>
 > Shows the map image for all to see```""")
     await bot.send_message(author, help_string)
-    await bot.say(str(author.display_name)+", I sent you a private message with the help commands.")
+    message = await bot.say(str(author.display_name)+", I sent you a private message with the help commands.")
+    await asyncio.sleep(100)
+    await bot.delete_message(message)
 
 @bot.command(pass_context=True)
 async def info(ctx, user: discord.Member):

@@ -78,10 +78,7 @@ __**General commands:**__
 > Shows some info about the @user
 
 # .serverinfo
-> Shows some info about the server
-
-# .check_if_admin
-> Checks if you can do the admin commands```
+> Shows some info about the server```
 
 __**AVA Dog Tag commands:**__
 ```md
@@ -466,12 +463,6 @@ async def update(ctx):
 #temporary commands
 #---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-@bot.command(pass_context = True)
-async def check_if_admin(ctx):
-    if check_admin_status(ctx):
-        await bot.say('You have BIG permissions! :O')
-    else:
-        await bot.say("You can't do the big stuff, sry")
 #---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #Bot services
 #---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

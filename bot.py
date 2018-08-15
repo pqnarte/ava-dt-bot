@@ -59,11 +59,11 @@ __**AVA Dog Tag Admin commands:**__
 > Erases the database for a fresh start (WARNING)```""")
         await bot.send_message(author, help_string)
         message = await bot.say(str(author.display_name)+", I sent you a private message with the admin help commands.")
-        await asyncio.sleep(100)
+        await asyncio.sleep(10)
         await bot.delete_message(message)
     else:
         message = await bot.say("You don't have admin privileges!")
-        await asyncio.sleep(100)
+        await asyncio.sleep(10)
         await bot.delete_message(message)
 
 @bot.command(pass_context = True)
@@ -99,7 +99,7 @@ __**AVA Dog Tag commands:**__
 > Shows the map image for all to see```""")
     await bot.send_message(author, help_string)
     message = await bot.say(str(author.display_name)+", I sent you a private message with the help commands.")
-    await asyncio.sleep(100)
+    await asyncio.sleep(10)
     await bot.delete_message(message)
 
 @bot.command(pass_context=True)

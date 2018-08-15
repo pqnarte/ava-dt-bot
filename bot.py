@@ -313,7 +313,7 @@ async def map(*args):
 @bot.command()
 async def weapon(*args):
     if len(args) == 0:
-        await bot.say("You need to type the weapon name!!\n If you don't know what weapons are availabe type: `.weapons` or `.pistols`")
+        await bot.say("You need to type the weapon name!!\nIf you don't know what weapons are availabe type: `.weapons`")
     else:
         if args[-1].upper() == 'MODS':
             input = ' '.join(args[:-1]).upper()

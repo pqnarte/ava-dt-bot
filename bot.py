@@ -11,6 +11,7 @@ from io import BytesIO
 import xml.etree.ElementTree as ET
 from discord.ext import commands
 from weapon import Weapon
+from tag import Tag
 from map import Map
 import sqlite3
 
@@ -20,10 +21,12 @@ general_weapon_stats = ['Hit Damage','Range','Single Fire Acc','Auto Fire Acc','
 
 bot = Bot(command_prefix=BOT_PREFIX)
 bot.remove_command('help')
-conn = sqlite3.connect('weapon.db') #Bom para testar
+conn = sqlite3.connect('weapon.db')
 c = conn.cursor()
 connmap = sqlite3.connect('map.db')
 cm = connmap.cursor()
+conntag = sqlite3.connect('tags.db')
+ctag = conntag.cursor()
 
 print(discord.__version__)
 
@@ -33,8 +36,44 @@ async def on_ready():
     await bot.change_presence(game=discord.Game(name='Type .help for help', type=1), status=None, afk=False)
 
 #---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#General functions
+#---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+def add_tag(tag):
+    with conntag:
+        ctag.execute("INSERT INTO tags VALUES (:tagname, :tagurl)",
+            {'tagname': tag.name, 'tagurl': tag.url})
+
+def update_tag(tag):
+    with conntag:
+        ctag.execute("UPDATE tags SET tagurl=:tagurl WHERE tagname=:tagname",
+        {'tagurl':tag.url,'tagname':tag.name})
+
+def remove_tag(tagname):
+    with conntag:
+        ctag.execute("DELETE FROM tags WHERE tagname=:tagname",
+        {'tagname':tagname})
+
+def get_tag_url(name):
+    tagurl = ctag.execute("SELECT tagurl FROM tags WHERE tagname=:tagname", {'tagname': name}).fetchone()
+    tagurl = str(tagurl).translate({ord(i):None for i in "'(),"})
+    return tagurl
+
+def remove_duplicate_tags():
+    with conntag:
+        ctag.execute("DELETE FROM tags WHERE rowid NOT IN (SELECT max(rowid) FROM tags GROUP BY tagname)")
+
+#---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #general commands
 #---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+@bot.command()
+async def tag(name):
+    try:
+        tag_url = get_tag_url(name)
+        embed = discord.Embed()
+        embed.set_image(url=tag_url)
+        await bot.say(embed=embed)
+    except Exception:
+        await bot.say(name+" not found, sorry.")
 
 @bot.command(pass_context = True)
 async def helpadmin(ctx):
@@ -365,6 +404,39 @@ async def weapon(*args):
 #---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 @bot.command(pass_context = True)
+async def tagadmin(ctx,*args):
+    if check_admin_status(ctx):
+        function = ""
+        if len(args) == 3:
+            function = args[0]
+            name = args[1]
+            url = args[2]
+        elif len(args) == 2:
+            function = args[0]
+            name = args[1]
+        if function.upper() == 'CREATE':
+            add_tag(Tag(name,url))
+            remove_duplicate_tags()
+            await bot.say("Tag created.")
+        elif function.upper() == 'EDIT':
+            update_tag(Tag(name,url))
+            await bot.say("Tag edited.")
+        elif function.upper() == 'REMOVE':
+            remove_tag(name)
+            await bot.say("Tag removed.")
+        else:
+            message = await bot.say("""You need to type the command like so: `.tagadmin create HelloJohn hello.jpg`
+This creates a tag with the name HelloJohn with the image link hello.jpg
+Possible functions are:
+.tagadmin create HelloJohn hello.jpg > This creates a tag HelloJohn linked to hello.jpg
+.tagadmin edit HelloJohn bye.jpg > This changes the link from hello.jpg to bye.jpg
+.tagadmin remove HelloJohn > This removes the tag HelloJohn""")
+    else:
+        message = await bot.say("You don't have the admin rights to do that!")
+        await asyncio.sleep(10)
+        await bot.delete(message)
+
+@bot.command(pass_context = True)
 async def clean_database(ctx):
     if check_admin_status(ctx):
         await bot.say("Are you sure you want to delete everything?\nThis cannot be undo\n`yes`   or   `no`")
@@ -468,12 +540,6 @@ async def update(ctx):
 #---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #temporary commands
 #---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-@bot.command()
-async def tag():
-    embed = discord.Embed()
-    embed.set_image(url = "https://bit.ly/2KDokYD")
-    await bot.say(embed=embed)
 
 #---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #Bot services

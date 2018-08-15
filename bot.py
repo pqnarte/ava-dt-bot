@@ -473,7 +473,7 @@ async def update(ctx):
 async def tag():
     embed = discord.Embed()
     embed.set_image(url = "https://bit.ly/2KDokYD")
-    wait bot.say(embed=embed)
+    await bot.say(embed=embed)
 
 #---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #Bot services

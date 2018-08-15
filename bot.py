@@ -38,8 +38,9 @@ async def on_ready():
 
 @bot.command(pass_context = True)
 async def helpadmin(ctx):
-    author = ctx.message.author
-    help_string = ("""```fix
+    if check_admin_status(ctx):
+        author = ctx.message.author
+        help_string = ("""```fix
 -----------------------------------------------------------------------------------------------------
 -------------------------------------------Admin Commands--------------------------------------------
 -----------------------------------------------------------------------------------------------------```
@@ -56,14 +57,15 @@ __**AVA Dog Tag Admin commands:**__
 
 # .clean_database
 > Erases the database for a fresh start (WARNING)```""")
-    await bot.send_message(author, help_string)
-    await bot.say(str(author.display_name)+", I sent you a private message with the admin help commands.")
+        await bot.send_message(author, help_string)
+        await bot.say(str(author.display_name)+", I sent you a private message with the admin help commands.")
+    else:
+        await bot.say("You don't have admin privileges!")
 
 @bot.command(pass_context = True)
 async def help(ctx):
-    if check_admin_status(ctx):
-        author = ctx.message.author
-        help_string = ("""```fix
+    author = ctx.message.author
+    help_string = ("""```fix
 -----------------------------------------------------------------------------------------------------
 --------------------------------------------Help Commands--------------------------------------------
 -----------------------------------------------------------------------------------------------------```
@@ -94,10 +96,8 @@ __**AVA Dog Tag commands:**__
 
 # .map <map_name_here>
 > Shows the map image for all to see```""")
-        await bot.send_message(author, help_string)
-        await bot.say(str(author.display_name)+", I sent you a private message with the help commands.")
-    else:
-	await bot.say("You don't have admin privileges!")
+    await bot.send_message(author, help_string)
+    await bot.say(str(author.display_name)+", I sent you a private message with the help commands.")
 
 @bot.command(pass_context=True)
 async def info(ctx, user: discord.Member):

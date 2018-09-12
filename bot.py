@@ -221,7 +221,7 @@ def get_map(mapName):
 
 def get_weapons_by_type(weaponClass):
     string = ""
-    weapon_of_type = c.execute("SELECT weaponName FROM weapons WHERE weaponClass=:weaponClass", {'weaponClass': weaponClass}).fetchall()
+    weapon_of_type = c.execute("SELECT weaponName FROM weapons WHERE weaponClass=:weaponClass ORDER BY weaponName", {'weaponClass': weaponClass}).fetchall()
     for weapon in weapon_of_type:
         string += str(weapon).translate({ord(i):None for i in "'(),"}) +'\n'
     return string
@@ -328,7 +328,7 @@ def remove_leads(args):
 async def weapons():
     embed = discord.Embed(color=0xff0000)
     embed.set_thumbnail(url=ava_logo_url)
-    all_types = c.execute("SELECT weaponClass FROM weapons WHERE rowid IN (SELECT min(rowid) FROM weapons GROUP BY weaponClass)").fetchall()
+    all_types = c.execute("SELECT weaponClass FROM weapons WHERE rowid IN (SELECT min(rowid) FROM weapons GROUP BY weaponClass) ORDER BY weaponClass").fetchall()
     print(all_types)
     for one_type in all_types:
         one_type = str(one_type).translate({ord(i):None for i in "'(),"})

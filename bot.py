@@ -169,13 +169,12 @@ async def weapon(ctx,*args):
         if selected:
             try:
                 weapon_data = get_weapon_data(link_data[i][1])
-                embed = discord.Embed(title=link_data[i][0], color = 0x00ff00)
+                embed = discord.Embed(title=link_data[i][0],url = link_data[i][1], color = 0x00ff00)
                 embed.set_thumbnail(url=ava_logo_url)
                 embed.set_image(url=weapon_data[1])
                 for field in weapon_data[0]:
                     embed.add_field(name=field[0],value=field[1])
                 await bot.say(embed=embed)
-                await bot.say('`'+link_data[i][1]+'`')
             except:
                 await bot.say('No weapons found with the name '+' '.join(args))
     else:

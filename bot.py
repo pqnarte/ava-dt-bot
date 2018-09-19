@@ -178,7 +178,7 @@ async def weapon(ctx,*args):
                     embed.add_field(name=field[0],value=field[1])
                 owner = await bot.get_user_info('180787341248561152')
                 embed.set_footer(text='Created by '+owner.name+'#'+owner.discriminator
-                    +' | '+datetime.now().strftime('%c'),icon_url=owner.avatar_url)
+                    +' | '+datetime.now().strftime('%c'))
                 await bot.say(embed=embed)
             except:
                 await bot.say('No weapons found with the name '+' '.join(args))
@@ -215,7 +215,7 @@ async def map(ctx,*args):
                     embed.add_field(name=field[0],value=field[1])
                 owner = await bot.get_user_info('180787341248561152')
                 embed.set_footer(text='Created by '+owner.name+'#'+owner.discriminator
-                    +' | '+datetime.now().strftime('%c'),icon_url=owner.avatar_url)
+                    +' | '+datetime.now().strftime('%c'))
                 await bot.say(embed=embed)
             except:
                 await bot.say('No maps found with the name '+' '.join(args))
@@ -236,7 +236,7 @@ async def weapons(ctx):
         embed.add_field(name='\u200b \n'+weapon_categories[index]+':',value=string,inline=False)
     owner = await bot.get_user_info('180787341248561152')
     embed.set_footer(text='Created by '+owner.name+'#'+owner.discriminator
-        +' | '+datetime.now().strftime('%c'),icon_url=owner.avatar_url)
+        +' | '+datetime.now().strftime('%c'))
     await bot.say(embed=embed)
 
 @bot.command(pass_context=True)
@@ -254,7 +254,7 @@ async def maps(ctx):
         embed.add_field(name='\u200b \n'+map_categories[index]+':',value=string,inline=False)
     owner = await bot.get_user_info('180787341248561152')
     embed.set_footer(text='Created by '+owner.name+'#'+owner.discriminator
-        +' | '+datetime.now().strftime('%c'),icon_url=owner.avatar_url)
+        +' | '+datetime.now().strftime('%c'))
     await bot.say(embed=embed)
 #---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #AVA ADMIN Commands

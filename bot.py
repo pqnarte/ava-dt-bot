@@ -7,6 +7,8 @@ from discord import Game
 from discord.ext.commands import Bot
 from discord.ext import commands
 
+from datetime import datetime
+
 from bs4 import BeautifulSoup
 import requests
 

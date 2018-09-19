@@ -176,7 +176,7 @@ async def weapon(ctx,*args):
                 embed.set_image(url=weapon_data[1])
                 for field in weapon_data[0]:
                     embed.add_field(name=field[0],value=field[1])
-                owner = await bot.get_user_info('180787341248561152')
+                owner = await bot.get_user_info(os.getenv('OWNER_ID'))
                 embed.set_footer(text='Created by '+owner.name+'#'+owner.discriminator
                     +' | '+datetime.now().strftime('%c'))
                 await bot.say(embed=embed)
@@ -213,7 +213,7 @@ async def map(ctx,*args):
                 embed.set_image(url=map_data[1])
                 for field in map_data[0]:
                     embed.add_field(name=field[0],value=field[1])
-                owner = await bot.get_user_info('180787341248561152')
+                owner = await bot.get_user_info(os.getenv('OWNER_ID'))
                 embed.set_footer(text='Created by '+owner.name+'#'+owner.discriminator
                     +' | '+datetime.now().strftime('%c'))
                 await bot.say(embed=embed)
@@ -234,7 +234,7 @@ async def weapons(ctx):
         for subindex in range(len(weapons[index])):
             string += weapons[index][subindex]+'\n'
         embed.add_field(name='\u200b \n'+weapon_categories[index]+':',value=string,inline=False)
-    owner = await bot.get_user_info('180787341248561152')
+    owner = await bot.get_user_info(os.getenv('OWNER_ID'))
     embed.set_footer(text='Created by '+owner.name+'#'+owner.discriminator
         +' | '+datetime.now().strftime('%c'))
     await bot.say(embed=embed)
@@ -252,7 +252,7 @@ async def maps(ctx):
         for subindex in range(len(maps[index])):
             string += maps[index][subindex]+'\n'
         embed.add_field(name='\u200b \n'+map_categories[index]+':',value=string,inline=False)
-    owner = await bot.get_user_info('180787341248561152')
+    owner = await bot.get_user_info(os.getenv('OWNER_ID'))
     embed.set_footer(text='Created by '+owner.name+'#'+owner.discriminator
         +' | '+datetime.now().strftime('%c'))
     await bot.say(embed=embed)

@@ -174,6 +174,9 @@ async def weapon(ctx,*args):
                 embed.set_image(url=weapon_data[1])
                 for field in weapon_data[0]:
                     embed.add_field(name=field[0],value=field[1])
+                owner = await bot.get_user_info('180787341248561152')
+                embed.set_footer(text='Created by '+owner.name+'#'+owner.discriminator
+                    +' | '+datetime.now().strftime('%c'),icon_url=owner.avatar_url)
                 await bot.say(embed=embed)
             except:
                 await bot.say('No weapons found with the name '+' '.join(args))
@@ -203,13 +206,15 @@ async def map(ctx,*args):
         if selected:
             try:
                 map_data = get_map_data(link_data[i][1])
-                embed = discord.Embed(title=link_data[i][0], color = 0x00ff00)
+                embed = discord.Embed(title=link_data[i][0],url=link_data[i][1], color = 0x00ff00)
                 embed.set_thumbnail(url=ava_logo_url)
                 embed.set_image(url=map_data[1])
                 for field in map_data[0]:
                     embed.add_field(name=field[0],value=field[1])
+                owner = await bot.get_user_info('180787341248561152')
+                embed.set_footer(text='Created by '+owner.name+'#'+owner.discriminator
+                    +' | '+datetime.now().strftime('%c'),icon_url=owner.avatar_url)
                 await bot.say(embed=embed)
-                await bot.say('`'+link_data[i][1]+'`')
             except:
                 await bot.say('No maps found with the name '+' '.join(args))
     else:
@@ -220,7 +225,6 @@ async def weapons(ctx):
     weapons = []
     for index in range(len(weapon_categories)):
         weapons.append(get_names_by_category(weapon_categories[index]))
-
     embed = discord.Embed(title='Weapons list', color = 0x00ff00)
     embed.set_thumbnail(url=ava_logo_url)
     for index in range(len(weapon_categories)):
@@ -228,6 +232,9 @@ async def weapons(ctx):
         for subindex in range(len(weapons[index])):
             string += weapons[index][subindex]+'\n'
         embed.add_field(name='\u200b \n'+weapon_categories[index]+':',value=string,inline=False)
+    owner = await bot.get_user_info('180787341248561152')
+    embed.set_footer(text='Created by '+owner.name+'#'+owner.discriminator
+        +' | '+datetime.now().strftime('%c'),icon_url=owner.avatar_url)
     await bot.say(embed=embed)
 
 @bot.command(pass_context=True)
@@ -243,6 +250,9 @@ async def maps(ctx):
         for subindex in range(len(maps[index])):
             string += maps[index][subindex]+'\n'
         embed.add_field(name='\u200b \n'+map_categories[index]+':',value=string,inline=False)
+    owner = await bot.get_user_info('180787341248561152')
+    embed.set_footer(text='Created by '+owner.name+'#'+owner.discriminator
+        +' | '+datetime.now().strftime('%c'),icon_url=owner.avatar_url)
     await bot.say(embed=embed)
 #---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #AVA ADMIN Commands

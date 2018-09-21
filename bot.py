@@ -270,7 +270,22 @@ async def maps(ctx):
 #---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #temporary commands
 #---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
+@bot.command(pass_context=True)
+async def ascii(ctx):
+    weapons = []
+    for index in range(len(weapon_categories)):
+        weapons.append(get_names_by_category(weapon_categories[index]))
+    t = PrettyTable()
+    weapon_array = []
+    for index in range(len(weapon_categories)):
+        weapon_names = ['']*10
+        i = 0
+        for subindex in range(len(weapons[index])):
+            weapon_names[i] = (weapons[index][subindex])
+            i+=1
+        t.add_column(str(weapon_categories[index]),weapon_names)
+        weapon_array.append(weapon_names)
+    await bot.say('```\nWeapons list\n'+str(t)+'\n```')
 #---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #Bot services (Bottom)
 #---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

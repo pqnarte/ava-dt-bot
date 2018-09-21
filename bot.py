@@ -173,7 +173,8 @@ async def weapon(ctx,*args):
                 weapon_data = get_weapon_data(link_data[i][1])
                 embed = discord.Embed(title=link_data[i][0],url = link_data[i][1], color = 0x00ff00)
                 embed.set_thumbnail(url=ava_logo_url)
-                embed.set_image(url=weapon_data[1])
+                if len(weapon_data[1]) > 0:
+                    embed.set_image(url=weapon_data[1])
                 for field in weapon_data[0]:
                     embed.add_field(name=field[0],value=field[1])
                 owner = await bot.get_user_info(os.getenv('OWNER_ID'))

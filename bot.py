@@ -16,7 +16,7 @@ BOT_PREFIX = (".")
 
 ava_logo_url='https://upload.wikimedia.org/wikipedia/commons/1/15/Alliance-of-valiant-arms-logo.png'
 Category_link = "http://ava-dog-tag.wikia.com/wiki/Category:"
-weapon_categories = ['Pointman','Rifleman','Sniper']
+weapon_categories = ['Pointman','Rifleman','Sniper','Secondary','Melee']
 map_categories = ['Annihilation','Demolition']
 
 #---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

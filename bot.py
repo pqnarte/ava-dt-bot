@@ -16,7 +16,7 @@ BOT_PREFIX = (".")
 
 ava_logo_url='https://upload.wikimedia.org/wikipedia/commons/1/15/Alliance-of-valiant-arms-logo.png'
 Category_link = "http://ava-dog-tag.wikia.com/wiki/Category:"
-weapon_categories = ['Pointman','Rifleman','Sniper','Secondary','Melee']
+weapon_categories = ['Pointman','Rifleman','Sniper','Secondary']
 map_categories = ['Annihilation','Demolition']
 
 #---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -78,7 +78,9 @@ def get_weapon_data(weapon_link):
     soup = BeautifulSoup(r.text,'html.parser')
     #description = soup.find("meta",  property="og:description")
     Image_tag = soup.find('figure',attrs={'class':'pi-item pi-image'})
-    Image_url = Image_tag.find('a')['href']
+    Image_url = ''
+    if Image_tag is not None:
+        Image_url = Image_tag.find('a')['href']
     embed = discord.Embed(color = 0x00ff00)
     results = soup.find_all('div',attrs={'class':'pi-item pi-data pi-item-spacing pi-border-color'})
     for result in results:
@@ -173,7 +175,8 @@ async def weapon(ctx,*args):
                 weapon_data = get_weapon_data(link_data[i][1])
                 embed = discord.Embed(title=link_data[i][0],url = link_data[i][1], color = 0x00ff00)
                 embed.set_thumbnail(url=ava_logo_url)
-                embed.set_image(url=weapon_data[1])
+                if len(weapon_data[1]) > 0:
+                    embed.set_image(url=weapon_data[1])
                 for field in weapon_data[0]:
                     embed.add_field(name=field[0],value=field[1])
                 owner = await bot.get_user_info(os.getenv('OWNER_ID'))

@@ -12,7 +12,7 @@ from datetime import datetime
 from bs4 import BeautifulSoup
 import requests
 
-from prettytable import PrettyTable
+from prettytable import PrettyTable 
 
 BOT_PREFIX = (".")
 

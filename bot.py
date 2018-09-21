@@ -12,6 +12,8 @@ from datetime import datetime
 from bs4 import BeautifulSoup
 import requests
 
+from prettytable import PrettyTable
+
 BOT_PREFIX = (".")
 
 ava_logo_url='https://upload.wikimedia.org/wikipedia/commons/1/15/Alliance-of-valiant-arms-logo.png'
